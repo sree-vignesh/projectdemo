@@ -1,0 +1,315 @@
+/**
+* Sample React Native App
+* https://github.com/facebook/react-native
+*
+* @format
+* @flow strict-local
+*/
+
+
+
+import React,{useState, useEffect} from 'react';
+import {StyleSheet, 
+  View, 
+  Text, 
+  Button,
+  PermissionsAndroid,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,} 
+  from 'react-native';
+  import {
+    WebView
+  } from 'react-native-webview'
+import Geolocation from 'react-native-geolocation-service';
+import MapView,{Polyline} from "react-native-maps";
+import { useRef } from "react";
+import html_script from './html_script'
+import {decode} from "@mapbox/polyline";
+import MapboxGL from '@react-native-mapbox-gl/maps';
+
+
+
+// Function to get permission for location
+const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Geolocation Permission',
+          message: 'Can we access your location?',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      console.log('granted', granted);
+      if (granted === 'granted') {
+        console.log('You can use Geolocation');
+        return true;
+      } else {
+        console.log('You cannot use Geolocation');
+        return false;
+      }
+    } catch (err) {
+      return false;
+    }
+  };
+
+const App = () => {
+
+
+  const getDirections = async (startLoc, destinationLoc) => {
+    try {
+      const KEY = "AIzaSyBRx8Y5Mp7CxZMp1RiJiyJpU0M97Jtruq8"; //put your API key here.
+      //otherwise, you'll have an 'unauthorized' error.
+      let resp = await fetch(
+        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62481f5593078cad4f29bab895b49d820cba&start=8.681495,49.41461&end=8.687872,49.420318`
+      );
+      console.log(resp);
+      let respJson = await resp.json();
+      /*let points = decode(respJson.routes[0].overview_polyline.points);
+      console.log(points);
+      let coords = points.map((point, index) => {
+        return {
+          latitude: point[0],
+          longitude: point[1]
+        };
+      });*/
+      return coords;
+    } catch (error) {
+      return error;
+    }
+  };
+
+
+
+  var request = new XMLHttpRequest();
+  request.open('GET', 'https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62481f5593078cad4f29bab895b49d820cba&start=8.681495,49.41461&end=8.687872,49.420318');
+  
+  request.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+  
+  request.onreadystatechange = function () {
+    if (this.readyState === 4) {
+      console.log('Status:', this.status);
+      console.log('Headers:', this.getAllResponseHeaders());
+      console.log('Body:', this.responseText);
+    }
+  };
+  
+  request.send();
+
+
+
+
+
+  const [coords, setCoords] = useState([]);
+
+  /*useEffect(() => {
+    //fetch the coordinates and then store its value into the coords Hook.
+    getDirections("13.0827,80.2707", "12.9166,79.1325")
+      .then(coords => setCoords(coords))
+      .catch(err => console.log("Something went wrong"));
+  }, []);*/
+    getLocation;
+    const tokyoRegion = {
+        latitude: 12.9165,
+        longitude: 79.1325,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+     
+    /*let currentcords ={
+        latitude= location.coords.latitude,
+        longitude= location.coords.longitude,
+    };*/
+    /*const Map_Ref=useRef(null);*/
+    const mapRef = useRef(null);
+    const goToTokyo = () => {
+        //Animate the user to new region. Complete this animation in 3 seconds
+        mapRef.current.animateToRegion(tokyoRegion, 3 * 1000);
+      };
+      const GoToCurrent = () => {
+        //Animate the user to new region. Complete this animation in 3 seconds
+        mapRef.current.animateToRegion(currentRegion, 3 * 1000);
+      };
+     
+      
+    // state to hold location
+  const [location, setLocation] = useState(false);
+ 
+  // function to check permissions and get Location
+  const getLocation = () => {
+    const result = requestLocationPermission();
+    result.then(res => {
+      console.log('res is:', res);
+      if (res) {
+        Geolocation.getCurrentPosition(
+          position => {
+            console.log(position);
+            setLocation(position);
+           
+            const currentRegion = {
+                latitude:location.coords.latitude ,
+                longitude : location.coords.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }
+            mapRef.current.animateToRegion(currentRegion,3*1000);
+          },
+          error => {
+            // See error code charts below.
+            console.log(error.code, error.message);
+            setLocation(false);
+          },
+          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        );
+      }
+     
+    });
+    console.log(location);
+  }
+  const updatemap = () =>{
+    getLocation();
+    //GoToCurrent();
+  }
+  /*const getDirections = async (startLoc, destinationLoc) => {
+    try {
+      const KEY = "AIzaSyBRx8Y5Mp7CxZMp1RiJiyJpU0M97Jtruq8"; //put your API key here.
+      //otherwise, you'll have an 'unauthorized' error.
+      let resp = await fetch(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${KEY}`
+      );
+      console.log(resp);
+      let respJson = await resp.json();
+      let points = decode(respJson.routes[0].overview_polyline.points);
+      console.log(points);
+      let coords = points.map((point, index) => {
+        return {
+          latitude: point[0],
+          longitude: point[1]
+        };
+      });
+      return coords;
+    } catch (error) {
+      return error;
+    }
+  };*/
+
+  _goToMyPosition = (lat, lon) => {
+    this.refs['Map_Ref'].injectJavaScript(`
+      mymap.setView([${lat}, ${lon}], 10)
+      L.marker([${lat}, ${lon}]).addTo(mymap)
+    `)
+  }
+  
+  ;
+    return (
+        /*if(location){
+            getLocation();
+        }*/
+        <View style={styles.container1}>
+          <Text>Welcome!</Text>
+          <View
+            style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
+           
+            <Button title="Get Location" onPress={updatemap}/>
+            
+          </View>
+          <Text>Latitude: {location ? location.coords.latitude : null}</Text>
+          <Text>Longitude: {location ? location.coords.longitude : null}</Text>
+          <View
+            style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
+            
+            <Button onPress={() => goToTokyo()} title="Go tooo Vellore" />
+            
+            {/* <Button onPress={openURL(https:/\/www.google.com/maps/search/)} title="Directions" /> */}
+          </View>
+          <View style={styles.container1}>
+    {/*Render our MapView*/}
+
+    
+      <MapView
+        style={styles.map}
+        //specify our coordinates.
+        ref={mapRef}
+        
+        initialRegion={{
+          latitude: 13.0827,
+          longitude: 80.2707,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+        
+      >
+        
+        {coords.length > 0 && <Polyline coordinates={coords} />}
+        </MapView>
+      
+
+
+        {/* <SafeAreaView style={styles.container1}>
+          <WebView ref={'Map_Ref'} /*useRef('Map_Ref')**  source={{html: html_script }} style={styles.Webview} />
+          <View style={styles.ButtonArea}>
+            <TouchableOpacity style={styles.Button} onPress={() => this._goToMyPosition(44.7866, 20.4489)}>
+              <Text style={styles.ButtonText}>Belgrade</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.Button} onPress={() => this._goToMyPosition(35.6804, 139.7690)}>
+              <Text style={styles.ButtonText}>Tokyo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.Button} onPress={() => this._goToMyPosition(40.4168, -3.7038)}>
+              <Text style={styles.ButtonText}>Madrid</Text>
+            </TouchableOpacity>
+            
+          </View>
+        </SafeAreaView> */}
+    </View>
+        </View>
+      );
+    };
+
+    const styles = StyleSheet.create({
+        container: {
+          ...StyleSheet.absoluteFillObject,
+          flex: 2, //the container will fill the whole screen.
+          justifyContent: "flex-end",
+          alignItems: "center",
+        },
+        container1:{
+            
+            flex:2,
+        },
+        map: {
+          ...StyleSheet.absoluteFillObject,
+        },
+        ButtonArea: {
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          alignItems: 'center'
+        },
+        Webview: {
+          flex: 2,
+          
+        },
+        Button: {
+          width: 80,
+          padding: 10,
+          borderRadius: 10,
+          backgroundColor: 'black',
+          alignItems: 'center'
+        },
+        ButtonText: {
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: 14,
+        }
+      });
+
+
+
+export default App;
+
+
+
+

@@ -1,0 +1,300 @@
+/*
+import React, { Component } from "react";
+import { Text, View, Button, Alert } from 'react-native';
+
+class App extends Component {
+
+   constructor(props) {
+      super(props);
+      this.state = { isToggle: true };
+   }
+
+   render(props) {
+      return (
+         <View style={{flex :1, justifyContent: 'center', margin: 15 }}>
+            <Button
+               onPress={() => {
+                  this.setState({ isToggle: !this.state.isToggle });
+               }}
+               title={
+                  this.state.isToggle ? 'ON' : "OFF"
+               }
+               color={
+                this.state.isToggle ? 'green' : 'red'
+               }
+            />
+         </View>
+      );
+   }
+}
+export default App;
+*/
+
+
+// Integration of Google map in React Native using react-native-maps
+// https://aboutreact.com/react-native-map-example/
+
+// Import React
+import React from 'react';
+// Import required components
+import {SafeAreaView, StyleSheet, View} from 'react-native';
+
+// Import Map and Marker
+import MapView, {Marker} from 'react-native-maps';
+
+import Geolocation from 'react-native-geolocation-service';
+
+const App = () => {
+  return (
+    <SafeAreaView style={{flex: 1}}>
+      <View style={styles.container}>
+        
+        <MapView
+          style={styles.mapStyle}
+          initialRegion={{
+            latitude: 13.0827,
+            longitude: 80.2707,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          customMapStyle={mapStyle}>
+          <Marker
+            draggable
+            coordinate={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+            }}
+            onDragEnd={
+              (e) => alert(JSON.stringify(e.nativeEvent.coordinate))
+            }
+            title={'Test Marker'}
+            description={'This is a description of the marker'}
+          />
+        </MapView>
+      </View>
+      
+    </SafeAreaView>
+  );
+};
+
+export default App;
+
+const mapStyle = [
+  {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+  {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+  {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+  {
+    featureType: 'administrative.locality',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#d59563'}],
+  },
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#d59563'}],
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{color: '#263c3f'}],
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#6b9a76'}],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry',
+    stylers: [{color: '#38414e'}],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry.stroke',
+    stylers: [{color: '#212a37'}],
+  },
+  {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#9ca5b3'}],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{color: '#746855'}],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [{color: '#1f2835'}],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#f3d19c'}],
+  },
+  {
+    featureType: 'transit',
+    elementType: 'geometry',
+    stylers: [{color: '#2f3948'}],
+  },
+  {
+    featureType: 'transit.station',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#d59563'}],
+  },
+  {
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{color: '#17263c'}],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [{color: '#515c6d'}],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.stroke',
+    stylers: [{color: '#17263c'}],
+  },
+];
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  mapStyle: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+});
+*/
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ *//* @format
+ * @flow strict-local
+ */
+
+            /*
+
+
+
+import React, {useState, useEffect,Component} from 'react';
+//import React,{Component} from 'react'
+
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  PermissionsAndroid,
+  Linking
+  
+  
+} from 'react-native';
+import MapView from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
+// Function to get permission for location
+const requestLocationPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Geolocation Permission',
+        message: 'Can we access your location?',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    console.log('granted', granted);
+    if (granted === 'granted') {
+      console.log('You can use Geolocation');
+      return true;
+    } else {
+      console.log('You cannot use Geolocation');
+      return false;
+    }
+  } catch (err) {
+    return false;
+  }
+};
+const App = () => {
+  // state to hold location
+  const [location, setLocation] = useState(false);
+  // function to check permissions and get Location
+  const getLocation = () => {
+    const result = requestLocationPermission();
+    result.then(res => {
+      console.log('res is:', res);
+      if (res) {
+        Geolocation.getCurrentPosition(
+          position => {
+            console.log(position);
+            setLocation(position);
+          },
+          error => {
+            // See error code charts below.
+            console.log(error.code, error.message);
+            setLocation(false);
+          },
+          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        );
+      }
+    });
+    console.log(location);
+  };
+  // Function to Send Location to twitter
+  const sendLocation = () => {
+    try {
+      if (location) {
+        const tweet = `latitude is ${location.coords.latitude} and longitude is ${location.coords.longitude}`;
+        const url = `https://twitter.com/intent/tweet?text=${tweet}`;
+        Linking.openURL(url);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <View style={styles.container}>
+      <Text>Welcome!</Text>
+     <View
+        style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
+        <Button title="Get Location" onPress={getLocation} />
+      </View>
+      <Text>Latitude: {location ? location.coords.latitude : null}</Text>
+      <Text>Longitude: {location ? location.coords.longitude : null}</Text>
+      <View
+        style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
+        <Button title="Send Location" onPress={sendLocation} />
+      </View>
+     
+    </View>
+ 
+  );
+  
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+export default App;
+*/
